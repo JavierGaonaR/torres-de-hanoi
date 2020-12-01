@@ -1,5 +1,7 @@
 from copy import deepcopy
 from numpy import random
+import pandas
+import time
 
 
 class Nodo:
@@ -81,7 +83,7 @@ def movimientos(nodo):
 
 
 def DFS(nodo):
-    global numeroNodo
+    global numeroNodo, nodoActual
     esEstadoMeta = False
 
     if esEstadoMeta == False:
@@ -96,7 +98,7 @@ def DFS(nodo):
 
             if nodo.estado == estadoMeta:
                 print('Estado Meta Alcanzado')
-                dibujarSolucion(nodo)
+                nodoActual = nodo
                 esEstadoMeta = True
 
                 return True
@@ -110,7 +112,7 @@ def DFS(nodo):
 
 
 def BFS(nodo):
-    global padresList, numeroNodo, hijosList, nivel
+    global padresList, numeroNodo, hijosList, nivel, nodoActual
     esEstadoMeta = False
 
     print('\nNivel : ', nivel)
@@ -134,12 +136,13 @@ def BFS(nodo):
                     hijo.padre = nodo
                     padre.hijos.append(hijo)
                     hijosList.append(hijo)
-                    print('└--Nodo Hijo:', hijo.numeroNodo,
-                          'Estado:', hijo.estado)
+                    print('└--Nodo Hijo:', hijo.numeroNodo, 'Estado:', hijo.estado)
+
                     if hijo.estado == estadoMeta:
                         print('Estado Meta Alcanzado')
-                        dibujarSolucion(hijo)
+                        nodoActual = hijo
                         esEstadoMeta = True
+
                         return True
                 else:
                     tieneHijos = True
@@ -152,7 +155,7 @@ def BFS(nodo):
 
 
 def BFS_enhanced(nodo):
-    global padresList, numeroNodo, hijosList, numDiscos
+    global padresList, numeroNodo, hijosList, numDiscos, nodoActual
 
     esEstadoMeta = False
     puntosMin = numDiscos * columnas
@@ -184,8 +187,9 @@ def BFS_enhanced(nodo):
 
                     if hijo.estado == estadoMeta:
                         print('\n\nEstado Meta alcanzado')
-                        dibujarSolucion(hijo)
                         esEstadoMeta = True
+                        nodoActual = hijo
+
                         return True
                 else:
                     tieneHijos = True
@@ -197,33 +201,11 @@ def BFS_enhanced(nodo):
         BFS_enhanced(nodo)
 
 
-# def leerEstado():
-#     global columnas
-#     estado=[]
-#     for x in range(0,columnas):
-#         print('Discos en la columna ',x+1,': ',)
-#         a = [int(x) for x in input().split()]
-#         estado.append(a)
-
-#     return estado
-
-
-# def imprimirSolucion(nodo):
-#     print('\nTrazando solucion:')
-#     while True:
-#         print('Nodo Numero: ', nodo.numeroNodo,'  Estodo:  ', nodo.estado)
-
-#         if nodo.padre != None:
-#             nodo = nodo.padre
-#         else:
-#             break
-
-
 def dibujarSolucion(nodo):
     global numDiscos, columnas
     
     while True:
-        estado = nodo.estado #reverseNodo(nodo.estado)
+        estado = nodo.estado
         print('\nNodo Numero: ', nodo.numeroNodo, '  Estodo:  ', estado)
         print("\n ", imprimirDisco(None), end="")
         print(" ", imprimirDisco(None), end="")
@@ -245,10 +227,17 @@ def dibujarSolucion(nodo):
             break
 
 
-# def reverseNodo(estado):
-#     for col in estado:
-#         col.reverse()
-#     return estado
+def obtenerIntentos(nodo):
+    estados = deepcopy(nodo)
+
+    i = 0
+    while True:
+        if nodo.padre != None:
+            i += 1
+            nodo = nodo.padre
+        else:
+            break
+    return i
 
 
 def imprimirDisco(numDisco):
@@ -298,45 +287,13 @@ def estadoAleatorio(numDiscos):
 
     return estadoInicial
 
-    # TODO: Agregar un ciclo de 20 y probar el estado inicial mismo en los 3 algoritmos y checar los tiempos y soluciones
-    # TODO: Agregar/buscar una libreria para el plot
-    # TODO: Eliminar los campos de entrada(ingresar esto... seleccionar...)
-    # TODO: Seleccionar o guardar los datos en un archivo de cvs, leerlos datos y plotearlos
-while True:
-    print('\n\t1. Depth First Search')
-    print('\t2. Breadth First Search')
-    print('\t3. Best First Search')
-    print('\t4. Salir')
+    # TODO: Comentar los datos y pregunar que donde se van a mostrar las soluciones graficas
+    # TODO: Leer los datos y plotearlos con pandas
 
-    opcion = input("\nSelecciona un algoritmo--> ")
+def prepararNodo():
+    estados[:] = [estadoInicial]
 
-    if opcion == '4':
-        print('\nSaliendo...')
-        break
-
-    # columnas = int(input("\nIngresa el numero de columnas--> "))
-
-    # print('\nIngresa el esatdo inicial: ')
-    # estadoInicial = leerEstado()
-    # print('\nIngresa el estado meta: ')
-    # estadoMeta = leerEstado()
-    
-    columnas = 3
-    numDiscos = 4
-
-    estadoInicial = [[2], [3], [1, 4]]
-    estadoMeta = [[],[],[4,3,2,1]]                  # El estado Meta se tiene que fijar de manera manual o randomizarlo
-
-    estadoInicial = estadoAleatorio(numDiscos)      # Se randomiza un estado inicial con 'n' discos
-
-    print("\n" * 30)
-    print('Estado Inicial: ', estadoInicial)
-    print('Estado Meta: ', estadoMeta)
-
-    estados = []
-    estados = [estadoInicial]
     numeroNodo = 1 
-
     nodo = Nodo()
     nodo.estado = estadoInicial
     nodo.numeroNodo = numeroNodo
@@ -348,18 +305,92 @@ while True:
     padresList = [nodo]
     hijosList = []
 
+columnas = 3
+numDiscos = 4
 
-    if opcion == '1':
-        print('\n--Depth First Search')
-        DFS(nodo)
+estadosList = []
 
-    elif opcion == '2':
-        print('\n--Breadth First Search')
-        BFS(nodo)
+tiempoBFS = []
+tiempoDFS = []
+tiempoBFS_e = []
 
-    elif opcion == '3':
-        print('\n--Best First Search')
-        BFS_enhanced(nodo)
-    else:
-        print('Opcion invalida')
-        continue
+movimientosBFS = []
+movimientosDFS = []
+movimientosBFS_e = []
+
+
+for i in range(20):
+
+    estadoInicial = [[2], [3], [1, 4]]
+    estadoMeta = [[],[],[4,3,2,1]]
+
+    while True:
+        estadoInicial = estadoAleatorio(numDiscos)
+        
+        if not estadoInicial in estadosList:
+            estadosList.append(estadoInicial)
+            break
+
+    estados = [estadoInicial]
+
+    numeroNodo = 1 
+    nodo = Nodo()
+    nodo.estado = estadoInicial
+    nodo.numeroNodo = numeroNodo
+    padresList = [nodo]
+    hijosList = []
+
+    nivel = 1
+
+    padresList = [nodo]
+    hijosList = []
+
+    nodoActual = Nodo()
+
+        # TODO: Hacer funciones para lanzar los algoritmos con las limpiezas
+    prepararNodo()
+    inicioTiempo = time.time()
+    DFS(nodo)
+    finTiempo = time.time()
+
+    tiempoDFS.append(finTiempo - inicioTiempo)
+    movimientosDFS.append(obtenerIntentos(nodoActual))
+
+
+    prepararNodo()
+    inicioTiempo = time.time()
+    BFS(nodo)
+    finTiempo = time.time()
+
+    tiempoBFS.append(finTiempo - inicioTiempo)
+    movimientosBFS.append(obtenerIntentos(nodoActual))
+
+
+    prepararNodo()
+    inicioTiempo = time.time()
+    BFS_enhanced(nodo)
+    finTiempo = time.time()
+
+    tiempoBFS_e.append(finTiempo - inicioTiempo)
+    movimientosBFS_e.append(obtenerIntentos(nodoActual))
+    #dibujarSolucion(nodoActual)
+
+
+csv = {'Estado Inicial': estadosList,
+        'Tiempo DFS': tiempoDFS,
+        'Movimientos DFS': movimientosDFS,
+        'Tiempo BFS': tiempoBFS,
+        'Movimientos BFS': movimientosBFS,
+        'Tiempo BFS_e': tiempoBFS_e,
+        'Movimientos BFS_e': movimientosBFS_e}
+
+df = pandas.DataFrame(csv, columns=['Estado Inicial',
+                                    'Tiempo DFS',
+                                    'Movimientos DFS',
+                                    'Tiempo BFS',
+                                    'Movimientos BFS',
+                                    'Tiempo BFS_e',
+                                    'Movimientos BFS_e'])
+
+print(df)
+df.to_csv (r'plot.csv', index = False, header=True)
