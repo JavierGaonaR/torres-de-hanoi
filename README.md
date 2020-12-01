@@ -1,6 +1,9 @@
 # torres-de-hanoi
  Algoritmos de busqueda
 
+ Requerimientos para una exitosa ejecución:
+    'pip install numpy pandas pygal lxml'
+
  DFS
  BFS
  BFS

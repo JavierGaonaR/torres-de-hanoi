@@ -1,7 +1,5 @@
 from copy import deepcopy
 from numpy import random
-import pandas
-import time
 
 
 class Nodo:
@@ -41,8 +39,27 @@ def calificar(nodo, disco):
                             calificar(nodo, disco - 1)             
 
 
+def movimiento(pila1, pila2):
+    p1 = pila1[:]
+    p2 = pila2[:]
+
+    if len(p1) > 0:
+        disco = p1[len(p1) - 1]
+        ultimoP2 = len(p2) - 1
+
+        if len(p2) == 0 or p2[ultimoP2] > disco:
+            p2.append(disco)
+            p1.pop()
+
+            return p1, p2
+        else:
+            return None
+    else:
+        return None
+
+
 def movimientos(nodo):
-    global columnas, numeroNodo, estados
+    global columnas, estados
     pila = []
 
     for x in range(0, columnas):
@@ -63,27 +80,8 @@ def movimientos(nodo):
     return None
 
 
-def movimiento(pila1, pila2):
-    p1 = pila1[:]
-    p2 = pila2[:]
-
-    if len(p1) > 0:
-        disco = p1[len(p1) - 1]
-        indexP2 = len(p2) - 1
-
-        if len(p2) == 0 or p2[indexP2] > disco:
-            p2.append(disco)
-            p1.pop()
-
-            return p1, p2
-        else:
-            return None
-    else:
-        return None
-
-
 def DFS(nodo):
-    global numeroNodo, nodoActual
+    global numeroNodo
     esEstadoMeta = False
 
     if esEstadoMeta == False:
@@ -98,7 +96,7 @@ def DFS(nodo):
 
             if nodo.estado == estadoMeta:
                 print('\n\nEstado Meta Alcanzado')
-                nodoActual = nodo
+                dibujarSolucion(nodo)
                 esEstadoMeta = True
 
                 return True
@@ -112,7 +110,7 @@ def DFS(nodo):
 
 
 def BFS(nodo):
-    global padresList, numeroNodo, hijosList, nivel, nodoActual
+    global padresList, numeroNodo, hijosList, nivel
     esEstadoMeta = False
 
     print('\nNivel : ', nivel)
@@ -136,13 +134,12 @@ def BFS(nodo):
                     hijo.padre = nodo
                     padre.hijos.append(hijo)
                     hijosList.append(hijo)
-                    print('└--Nodo Hijo:', hijo.numeroNodo, 'Estado:', hijo.estado)
-
+                    print('└--Nodo Hijo:', hijo.numeroNodo,
+                          'Estado:', hijo.estado)
                     if hijo.estado == estadoMeta:
                         print('\n\nEstado Meta Alcanzado')
-                        nodoActual = hijo
+                        dibujarSolucion(hijo)
                         esEstadoMeta = True
-
                         return True
                 else:
                     tieneHijos = True
@@ -155,7 +152,7 @@ def BFS(nodo):
 
 
 def BFS_enhanced(nodo):
-    global padresList, numeroNodo, hijosList, numDiscos, nodoActual
+    global padresList, numeroNodo, hijosList, numDiscos
 
     esEstadoMeta = False
     puntosMin = numDiscos * columnas
@@ -187,9 +184,8 @@ def BFS_enhanced(nodo):
 
                     if hijo.estado == estadoMeta:
                         print('\n\nEstado Meta alcanzado')
+                        dibujarSolucion(hijo)
                         esEstadoMeta = True
-                        nodoActual = hijo
-
                         return True
                 else:
                     tieneHijos = True
@@ -201,17 +197,15 @@ def BFS_enhanced(nodo):
         BFS_enhanced(nodo)
 
 
-def obtenerIntentos(nodo):
-    estados = deepcopy(nodo)
+def leerEstado():
+    global columnas
+    estado=[]
+    for x in range(0,columnas):
+        print('Discos en la columna ',x+1,': ',)
+        a = [int(x) for x in input().split()]
+        estado.append(a)
 
-    i = 0
-    while True:
-        if nodo.padre != None:
-            i += 1
-            nodo = nodo.padre
-        else:
-            break
-    return i
+    return estado
 
 
 def dibujarSolucion(nodo):
@@ -266,72 +260,56 @@ def imprimirDisco(numDisco):
     return disco
 
 
-def estadoAleatorio(numDiscos):
-    global columnas
-    discos = []
+# def estadoAleatorio(numDiscos):
+#     global columnas
+#     discos = []
 
-    for i in range(numDiscos):
-        discos.append(i + 1)
+#     for i in range(numDiscos):
+#         discos.append(i + 1)
 
-    random.shuffle(discos)
+#     random.shuffle(discos)
 
-    estadoInicial = [[], [], []]
+#     estadoInicial = [[], [], []]
 
-    while len(discos) > 0:         
-        columnaAleatoria = int(random.randint(columnas))
-        indexDiscoAleatorio = random.randint(len(discos))
+#     while len(discos) > 0:         
+#         columnaAleatoria = int(random.randint(columnas))
+#         indexDiscoAleatorio = random.randint(len(discos))
 
-        estadoInicial[columnaAleatoria].append(discos.pop(indexDiscoAleatorio))
+#         estadoInicial[columnaAleatoria].append(discos.pop(indexDiscoAleatorio))
 
-    random.shuffle(estadoInicial)
+#     random.shuffle(estadoInicial)
 
-    return estadoInicial
-
-
-def prepararNodo():
-    estados[:] = [estadoInicial]
-
-    numeroNodo = 1 
-    nodo = Nodo()
-    nodo.estado = estadoInicial
-    nodo.numeroNodo = numeroNodo
-    padresList = [nodo]
-    hijosList = []
-
-    nivel = 1
-
-    padresList = [nodo]
-    hijosList = []
-
+#     return estadoInicial
 
 columnas = 3
 numDiscos = 4
 
-estadosList = []
-
-tiempoBFS = []
-tiempoDFS = []
-tiempoBFS_e = []
-
-movimientosBFS = []
-movimientosDFS = []
-movimientosBFS_e = []
-
-estadoInicial = [[2], [3], [1, 4]]
-estadoMeta = [[],[],[4,3,2,1]]
-
 for i in range(20):
+    print('\n\t1. Depth First Search')
+    print('\t2. Breadth First Search')
+    print('\t3. Best First Search')
+    print('\t4. Salir')
 
-    while True:
-        estadoInicial = estadoAleatorio(numDiscos)
-        
-        if not estadoInicial in estadosList:
-            estadosList.append(estadoInicial)
-            break
-    
-    print("\n" * 3, "-" * 10, "Numero de iteración: ", i + 1, " ", "-" * 10)
+    opcion = input("\nSelecciona un algoritmo--> ")
+
+    if opcion == '4':
+        print('\nSaliendo...')
+        break
+
+    estadoInicial = [[2], [3], [1, 4]]
+    estadoMeta = [[],[],[4,3,2,1]]    
+
+    # columnas = int(input("\nIngresa el numero de columnas--> "))
+
+    print('\nIngresa el esatdo inicial: ')
+    estadoInicial = leerEstado()
+    # print('\nIngresa el estado meta: ')
+    # estadoMeta = leerEstado()
+
+
+    print("\n" * 30)
     print('Estado Inicial: ', estadoInicial)
-
+    print('Estado Meta: ', estadoMeta)
 
     estados = [estadoInicial]
 
@@ -347,53 +325,18 @@ for i in range(20):
     padresList = [nodo]
     hijosList = []
 
-    nodoActual = Nodo()
 
+    if opcion == '1':
+        print('\n--Depth First Search')
+        DFS(nodo)
 
-    prepararNodo()
-    inicioTiempo = time.time()
-    DFS(nodo)
-    finTiempo = time.time()
+    elif opcion == '2':
+        print('\n--Breadth First Search')
+        BFS(nodo)
 
-    tiempoDFS.append(finTiempo - inicioTiempo)
-    movimientosDFS.append(obtenerIntentos(nodoActual))
-
-
-    prepararNodo()
-    inicioTiempo = time.time()
-    BFS(nodo)
-    finTiempo = time.time()
-
-    tiempoBFS.append(finTiempo - inicioTiempo)
-    movimientosBFS.append(obtenerIntentos(nodoActual))
-
-
-    prepararNodo()
-    inicioTiempo = time.time()
-    BFS_enhanced(nodo)
-    finTiempo = time.time()
-
-    tiempoBFS_e.append(finTiempo - inicioTiempo)
-    movimientosBFS_e.append(obtenerIntentos(nodoActual))
-
-
-csv = {'Estado Inicial': estadosList,
-        'Tiempo DFS': tiempoDFS,
-        'Movimientos DFS': movimientosDFS,
-        'Tiempo BFS': tiempoBFS,
-        'Movimientos BFS': movimientosBFS,
-        'Tiempo BFS_e': tiempoBFS_e,
-        'Movimientos BFS_e': movimientosBFS_e}
-
-df = pandas.DataFrame(csv, columns=['Estado Inicial',
-                                    'Tiempo DFS',
-                                    'Movimientos DFS',
-                                    'Tiempo BFS',
-                                    'Movimientos BFS',
-                                    'Tiempo BFS_e',
-                                    'Movimientos BFS_e'])
-
-print("\n"*10)
-print(df)
-df.to_csv (r'plot.csv', index = False, header=True)
-input("\nPresiona cualquier tecla para continuar...")
+    elif opcion == '3':
+        print('\n--Best First Search')
+        BFS_enhanced(nodo)
+    else:
+        print('Opcion invalida')
+        continue
