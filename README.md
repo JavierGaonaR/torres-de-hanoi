@@ -42,7 +42,7 @@ Otra grafica compara los movimientos realizados de los tres algoritmos, desde el
 ![Movimientos Realizados](https://i.imgur.com/m57B8nQ.png)
 
 
-**torre-de-hanoi-graphics.py** - Este script, puede ser de utilidad ya que nos ofrece de manera visible el como se encontro la solución, de cada estado inicial, en cualquiera de los 3 algoritmos, solo hay que elegir el algoritmo.
+**torre-de-hanoi-graphics.py** - Este script puede ser de utilidad ya que nos ofrece de manera visible el como se encontro la solución de cada estado inicial en cualquiera de los 3 algoritmos, solo hay que elegir el algoritmo.
 
 ![torre-de-hanoi-graphics.py](https://i.imgur.com/NrVo6Cq.png)
 
