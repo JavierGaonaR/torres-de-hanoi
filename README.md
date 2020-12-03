@@ -1,6 +1,6 @@
 # torres-de-hanoi
 
-Algoritmos de busqueda para el juego de torres de hanoi. Los algoritmos empleados para la busqueda de una solución fueron DFS, BFS, Best FS.
+Algoritmos de búsqueda para el juego de torres de hanoi. Los algoritmos empleados para la busqueda de una solución fueron DFS, BFS, Best FS.
 
 ## Pre-requisitos 📋
 
